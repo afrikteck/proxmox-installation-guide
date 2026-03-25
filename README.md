@@ -22,7 +22,7 @@ Ce repository contient la documentation technique complète pour l'installation 
 
 ### Installation Proxmox
 Consultez le fichier `INSTALLATION_PROXMOX_DEBIAN.md` pour :
-- Installation complète de Proxmox VE sur Debian 12
+- Installation complète de Proxmox VE sur Debian 13
 - Configuration réseau et stockage
 - Sécurisation et optimisation
 - Commandes de maintenance
@@ -44,7 +44,7 @@ afrikteck-proxmox-guide/
 ```
 
 ## Prérequis Techniques
-- **OS :** Debian 12 (Bookworm)
+- **OS :** Debian 13 (Trixie)
 - **Matériel :** Serveur 64-bit avec support virtualisation
 - **Réseau :** Connexion Internet stable
 - **Accès :** Privilèges administrateur
@@ -92,7 +92,7 @@ Ce projet est sous **AFRIKTECK OPEN LICENSE** - une licence permissive qui autor
 Voir le fichier `LICENSE` pour les détails complets.
 
 ## Versions
-- **v1.0.0** - Guide initial Proxmox VE sur Debian 12
+- **v1.0.0** - Guide initial Proxmox VE sur Debian 13
 - **Prochaines versions** - Scripts d'automatisation, configurations avancées
 
 ---
