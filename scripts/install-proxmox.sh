@@ -148,48 +148,27 @@ check_pve_kernel() {
 configure_network() {
     log "INFO" "Configuration du réseau..."
     
-    # Affichage des interfaces disponibles
-    echo -e "${CYAN}Interfaces réseau disponibles:${NC}"
-    ip -br link show | grep -E "^(eth|ens|enp)" | awk '{print "  - " $1}'
-    echo ""
-    
-    # Sélection de l'interface
-    while true; do
-        read -p "Interface réseau à utiliser: " NETWORK_INTERFACE
-        if ip link show "$NETWORK_INTERFACE" &>/dev/null; then
-            break
-        else
-            log "WARN" "Interface '$NETWORK_INTERFACE' non trouvée"
-        fi
-    done
-    
-    # Configuration IP statique
-    while true; do
-        read -p "Adresse IP statique (ex: 192.168.1.100/24): " STATIC_IP
-        if [[ $STATIC_IP =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}/[0-9]{1,2}$ ]]; then
-            break
-        else
-            log "WARN" "Format IP invalide (utilisez CIDR: x.x.x.x/xx)"
-        fi
-    done
-    
-    # Configuration gateway
-    while true; do
-        read -p "Passerelle (ex: 192.168.1.1): " GATEWAY_IP
-        if [[ $GATEWAY_IP =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$ ]]; then
-            break
-        else
-            log "WARN" "Format IP de passerelle invalide"
-        fi
-    done
-    
-    # Configuration hostname
-    read -p "Nom d'hôte FQDN (ex: proxmox.afrikteck.local): " HOSTNAME_FQDN
-    if [[ -z "$HOSTNAME_FQDN" ]]; then
-        HOSTNAME_FQDN="proxmox.afrikteck.local"
+    # Détection automatique de l'interface principale
+    NETWORK_INTERFACE=$(ip route | grep default | awk '{print $5}' | head -1)
+    if [[ -z "$NETWORK_INTERFACE" ]]; then
+        NETWORK_INTERFACE="ens18"  # Fallback pour VM
     fi
     
-    log "INFO" "Configuration réseau: $STATIC_IP via $GATEWAY_IP sur $NETWORK_INTERFACE"
+    # Configuration IP automatique basée sur l'IP actuelle
+    CURRENT_IP=$(ip route get 1 | awk '{print $7}' | head -1)
+    if [[ -n "$CURRENT_IP" ]]; then
+        STATIC_IP="$CURRENT_IP/24"
+        GATEWAY_IP=$(ip route | grep default | awk '{print $3}' | head -1)
+    else
+        # Configuration par défaut
+        STATIC_IP="192.168.1.100/24"
+        GATEWAY_IP="192.168.1.1"
+    fi
+    
+    # Configuration hostname
+    HOSTNAME_FQDN="proxmox.afrikteck.local"
+    
+    log "INFO" "Configuration réseau automatique: $STATIC_IP via $GATEWAY_IP sur $NETWORK_INTERFACE"
 }
 
 # Mise à jour du système
@@ -375,14 +354,12 @@ post_install_config() {
         log "INFO" "Repository enterprise désactivé"
     fi
     
-    # Configuration du pare-feu (optionnel)
-    read -p "Configurer le pare-feu Proxmox ? (y/N): " configure_firewall
-    if [[ $configure_firewall =~ ^[Yy]$ ]]; then
-        pvesh set /cluster/firewall/options --enable 1
-        pvesh create /cluster/firewall/rules --type in --action ACCEPT --proto tcp --dport 22 --comment "SSH"
-        pvesh create /cluster/firewall/rules --type in --action ACCEPT --proto tcp --dport 8006 --comment "Proxmox Web UI"
-        log "INFO" "Pare-feu configuré"
-    fi
+    # Configuration du pare-feu automatique
+    log "INFO" "Configuration du pare-feu Proxmox..."
+    pvesh set /cluster/firewall/options --enable 1 2>/dev/null || true
+    pvesh create /cluster/firewall/rules --type in --action ACCEPT --proto tcp --dport 22 --comment "SSH" 2>/dev/null || true
+    pvesh create /cluster/firewall/rules --type in --action ACCEPT --proto tcp --dport 8006 --comment "Proxmox Web UI" 2>/dev/null || true
+    log "INFO" "Pare-feu configuré automatiquement"
 }
 
 # Vérification de l'installation
@@ -415,14 +392,9 @@ verify_installation() {
 
 # Fonction de redémarrage
 reboot_system() {
-    read -p "Redémarrer maintenant ? (Y/n): " reboot_now
-    if [[ ! $reboot_now =~ ^[Nn]$ ]]; then
-        log "INFO" "Redémarrage du système..."
-        sleep 3
-        reboot
-    else
-        log "WARN" "Redémarrage manuel requis pour finaliser l'installation"
-    fi
+    log "INFO" "Redémarrage automatique dans 5 secondes..."
+    sleep 5
+    reboot
 }
 
 #===============================================================================
