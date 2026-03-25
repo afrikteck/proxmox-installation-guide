@@ -238,21 +238,15 @@ main() {
     backup_system
     download_scripts
     
-    # Confirmation avant installation
+    # Confirmation automatique pour déploiement
     echo ""
     warn "ATTENTION: Cette installation va modifier votre système"
-    read -p "Continuer l'installation Proxmox VE ? (y/N): " confirm_install
+    log "INFO" "Déploiement automatique AFRIKTECK en cours..."
     
-    if [[ $confirm_install =~ ^[Yy]$ ]]; then
-        run_installation
-        run_configuration
-        cleanup
-        show_final_info
-    else
-        info "Installation annulée par l'utilisateur"
-        cleanup
-        exit 0
-    fi
+    run_installation
+    run_configuration
+    cleanup
+    show_final_info
 }
 
 # Gestion des erreurs et interruptions
