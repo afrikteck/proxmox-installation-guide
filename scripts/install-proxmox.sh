@@ -133,6 +133,94 @@ configure_proxmox_repo() {
     log "INFO" "Configuration: Proxmox VE $PROXMOX_VERSION sur Debian $DEBIAN_VERSION"
 }
 
+# Prévention des blocages fsck
+prevent_fsck_hang() {
+    log "INFO" "Prévention des blocages fsck..."
+    
+    # Forcer fsck à ne pas être interactif
+    tune2fs -c 0 -i 0 /dev/sda3 2>/dev/null || log "WARN" "Impossible de configurer tune2fs"
+    
+    # Désactiver fsck automatique au boot
+    tune2fs -C 0 /dev/sda3 2>/dev/null || log "WARN" "Impossible de réinitialiser le compteur fsck"
+    
+    # Ajouter paramètres pour éviter fsck au boot
+    # Détection de la carte graphique pour paramètres adaptés
+    local gpu_vendor=$(lspci | grep -i vga | head -1)
+    local grub_params="nomodeset acpi=on fsck.mode=skip"
+    
+    if echo "$gpu_vendor" | grep -qi "nvidia"; then
+        grub_params="$grub_params nouveau.modeset=0"
+    elif echo "$gpu_vendor" | grep -qi "amd\|ati"; then
+        grub_params="$grub_params radeon.modeset=0 amdgpu.modeset=0"
+    elif echo "$gpu_vendor" | grep -qi "intel"; then
+        grub_params="$grub_params i915.modeset=0"
+    fi
+    
+    sed -i "s/GRUB_CMDLINE_LINUX_DEFAULT=\"[^\"]*\"/GRUB_CMDLINE_LINUX_DEFAULT=\"$grub_params\"/" /etc/default/grub
+    
+    log "INFO" "Configuration fsck mise à jour"
+}
+
+# Détection automatique de la carte graphique et configuration GRUB
+configure_grub_for_gpu() {
+    log "INFO" "Détection de la carte graphique..."
+    
+    local gpu_vendor=$(lspci | grep -i vga | head -1)
+    local grub_params="nomodeset acpi=on"
+    
+    if echo "$gpu_vendor" | grep -qi "nvidia"; then
+        log "INFO" "Carte NVIDIA détectée - ajout paramètres spécifiques"
+        grub_params="$grub_params nouveau.modeset=0"
+    elif echo "$gpu_vendor" | grep -qi "amd\|ati"; then
+        log "INFO" "Carte AMD/ATI détectée - ajout paramètres spécifiques"
+        grub_params="$grub_params radeon.modeset=0 amdgpu.modeset=0"
+    elif echo "$gpu_vendor" | grep -qi "intel"; then
+        log "INFO" "Carte Intel détectée - configuration basique"
+        grub_params="$grub_params i915.modeset=0"
+    else
+        log "INFO" "Carte graphique générique détectée"
+    fi
+    
+    log "INFO" "Paramètres GRUB: $grub_params"
+    
+    # Configuration GRUB adaptative
+    cat > /etc/default/grub << EOF
+# Configuration GRUB optimisée pour Proxmox VE
+GRUB_DEFAULT=0
+GRUB_TIMEOUT=5
+GRUB_DISTRIBUTOR=\`( . /etc/os-release && echo \${NAME} )\`
+GRUB_CMDLINE_LINUX_DEFAULT="$grub_params"
+GRUB_CMDLINE_LINUX="systemd.unified_cgroup_hierarchy=1"
+GRUB_TERMINAL=console
+GRUB_DISABLE_OS_PROBER=true
+EOF
+}
+
+# Détection et correction des problèmes de boot
+fix_boot_issues() {
+    log "INFO" "Correction des problèmes de boot potentiels..."
+    
+    # Vérification du système de fichiers
+    if ! mountpoint -q /boot/efi; then
+        log "WARN" "Partition EFI non montée, tentative de montage..."
+        mount /boot/efi 2>/dev/null || log "WARN" "Impossible de monter /boot/efi"
+    fi
+    
+    # Configuration GRUB pour éviter les blocages
+    log "INFO" "Configuration GRUB pour éviter les blocages au boot..."
+    
+    # Sauvegarde de la config GRUB
+    cp /etc/default/grub /etc/default/grub.backup.$(date +%Y%m%d_%H%M%S)
+    
+    # Configuration GRUB adaptative selon la carte graphique
+    configure_grub_for_gpu
+    
+    # Mise à jour GRUB
+    update-grub
+    
+    log "INFO" "Configuration GRUB mise à jour"
+}
+
 # Détection du kernel PVE
 check_pve_kernel() {
     if uname -r | grep -q "pve"; then
@@ -261,7 +349,7 @@ ff02::1 ip6-allnodes
 ff02::2 ip6-allrouters
 EOF
     
-    # Configuration /etc/network/interfaces
+    # Configuration /etc/network/interfaces avec fallback
     cat > /etc/network/interfaces << EOF
 # Configuration réseau générée par AFRIKTECK Proxmox Auto-Installer
 # $(date)
@@ -269,6 +357,13 @@ EOF
 auto lo
 iface lo inet loopback
 
+# Configuration interface physique (fallback pour kernel Debian)
+auto $NETWORK_INTERFACE
+iface $NETWORK_INTERFACE inet static
+    address $STATIC_IP
+    gateway $GATEWAY_IP
+
+# Configuration bridge Proxmox (prioritaire si kernel PVE)
 auto vmbr0
 iface vmbr0 inet static
     address $STATIC_IP
@@ -277,6 +372,18 @@ iface vmbr0 inet static
     bridge-stp off
     bridge-fd 0
     # Configuration bridge pour Proxmox VE
+EOF
+
+    # Créer une config de secours pour kernel Debian
+    cat > /etc/network/interfaces.debian-fallback << EOF
+# Configuration réseau de secours pour kernel Debian
+auto lo
+iface lo inet loopback
+
+auto $NETWORK_INTERFACE
+iface $NETWORK_INTERFACE inet static
+    address $STATIC_IP
+    gateway $GATEWAY_IP
 EOF
     
     log "INFO" "Configuration réseau appliquée"
@@ -391,6 +498,44 @@ verify_installation() {
 
 # Fonction de redémarrage
 reboot_system() {
+    log "INFO" "Configuration capture des logs de boot..."
+    
+    # Vérifier et corriger le montage EFI
+    if ! mountpoint -q /boot/efi; then
+        mount /boot/efi 2>/dev/null || log "WARN" "Impossible de monter /boot/efi"
+    fi
+    
+    # Script pour sauver les logs après reboot (même en cas de blocage)
+    cat > /root/save_crash_logs.sh << 'EOF'
+#!/bin/bash
+# Capture tous les logs de boot, même en cas de blocage
+journalctl -b -1 > /root/boot_crash_logs.txt 2>/dev/null
+dmesg > /root/kernel_crash_logs.txt 2>/dev/null
+# Capture les logs fsck spécifiquement
+journalctl -b -1 | grep -i "fsck\|clean.*blocks\|sda3" > /root/fsck_logs.txt 2>/dev/null
+# Logs en temps réel du kernel
+journalctl -b -1 -k > /root/kernel_boot_logs.txt 2>/dev/null
+echo "Logs sauvés à $(date)" > /root/logs_timestamp.txt
+EOF
+    chmod +x /root/save_crash_logs.sh
+    
+    # Ajouter le script au démarrage pour capture automatique
+    cat > /etc/systemd/system/capture-boot-logs.service << 'EOF'
+[Unit]
+Description=Capture Boot Logs
+After=multi-user.target
+
+[Service]
+Type=oneshot
+ExecStart=/root/save_crash_logs.sh
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
+EOF
+    
+    systemctl enable capture-boot-logs.service
+    
     log "INFO" "Redémarrage automatique dans 5 secondes..."
     sleep 5
     reboot
@@ -431,6 +576,8 @@ main() {
         install_dependencies
         setup_proxmox_repository
         apply_network_config
+        prevent_fsck_hang
+        fix_boot_issues
         install_pve_kernel
         
         log "INFO" "Kernel PVE installé. Redémarrage requis."
