@@ -44,7 +44,7 @@
 - **Réseau :** Interface Ethernet
 
 ### Configuration Logicielle
-- **OS :** Debian 12 (Bookworm) - Installation propre
+- **OS :** Debian 13 (Trixie) - Installation propre
 - **Accès :** Root ou utilisateur avec privilèges sudo
 - **Réseau :** IP statique configurée
 - **DNS :** Résolution de noms fonctionnelle
@@ -94,12 +94,12 @@ apt install -y bridge-utils vlan ifupdown2
 
 ### 1. Ajout de la clé GPG Proxmox
 ```bash
-wget https://enterprise.proxmox.com/debian/proxmox-release-bookworm.gpg -O /etc/apt/trusted.gpg.d/proxmox-release-bookworm.gpg
+wget https://enterprise.proxmox.com/debian/proxmox-release-trixie.gpg -O /etc/apt/trusted.gpg.d/proxmox-release-trixie.gpg
 ```
 
 ### 2. Ajout du repository
 ```bash
-echo "deb [arch=amd64] http://download.proxmox.com/debian/pve bookworm pve-no-subscription" > /etc/apt/sources.list.d/pve-install-repo.list
+echo "deb [arch=amd64] http://download.proxmox.com/debian/pve trixie pve-no-subscription" > /etc/apt/sources.list.d/pve-install-repo.list
 ```
 
 ### 3. Mise à jour des sources
@@ -137,7 +137,7 @@ uname -r
 
 ### 1. Suppression du kernel Debian (optionnel)
 ```bash
-apt remove linux-image-amd64 'linux-image-6.1*'
+apt remove linux-image-amd64 'linux-image-6.11*'
 update-grub
 ```
 
