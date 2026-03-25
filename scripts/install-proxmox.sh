@@ -286,10 +286,10 @@ EOF
 install_pve_kernel() {
     log "INFO" "Installation du kernel Proxmox VE..."
     
-    # Détection du kernel recommandé selon la version
+    # Utilisation du kernel le plus récent disponible
     case $DEBIAN_VERSION in
         "13")
-            KERNEL_VERSION="pve-kernel-6.8"
+            KERNEL_VERSION="proxmox-kernel-6.17"
             ;;
         "12")
             KERNEL_VERSION="pve-kernel-6.5"
