@@ -198,7 +198,6 @@ install_dependencies() {
         "wget"
         "curl"
         "gnupg2"
-        "software-properties-common"
         "apt-transport-https"
         "ca-certificates"
         "bridge-utils"
