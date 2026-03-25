@@ -4,7 +4,7 @@
 # AFRIKTECK Proxmox Deployment Script - GitHub Integration
 # 
 # Propriété intellectuelle: AFRIKTECK - Datacenter Solutions
-# Copyright: © 2024 AFRIKTECK - Tous droits réservés
+# Copyright: © 2026 AFRIKTECK - Tous droits réservés
 # Contact: contact@afrikteck.com
 #
 # Ce script permet le déploiement automatique de Proxmox depuis GitHub
@@ -219,7 +219,7 @@ show_final_info() {
     echo "• Email: contact@afrikteck.com"
     echo "• Issues GitHub: https://github.com/afrikteck/proxmox-installation-guide/issues"
     echo ""
-    echo "© 2024 AFRIKTECK - Datacenter Solutions, Libreville, Gabon"
+    echo "© 2026 AFRIKTECK - Datacenter Solutions, Libreville, Gabon"
     echo "Propriété intellectuelle AFRIKTECK - Tous droits réservés"
     echo "==============================================================================="
 }

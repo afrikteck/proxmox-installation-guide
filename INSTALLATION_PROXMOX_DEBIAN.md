@@ -1,7 +1,7 @@
 # Guide d'Installation Proxmox VE sur Debian - AFRIKTECK
 
 **Propriété intellectuelle :** AFRIKTECK - Datacenter Solutions  
-**Copyright :** © 2024 AFRIKTECK - Tous droits réservés  
+**Copyright :** © 2026 AFRIKTECK - Tous droits réservés  
 **Société :** AFRIKTECK  
 **Localisation :** Libreville, Gabon  
 **Spécialité :** Datacenter et Infrastructure  
@@ -274,7 +274,7 @@ tar -czf /root/pve-backup-$(date +%Y%m%d).tar.gz /etc/pve
 
 ## ⚖️ PROPRIÉTÉ INTELLECTUELLE
 
-**© 2024 AFRIKTECK - Datacenter Solutions - Tous droits réservés**
+**© 2026 AFRIKTECK - Datacenter Solutions - Tous droits réservés**
 
 **AVERTISSEMENT LÉGAL :** Ce document est la propriété intellectuelle d'AFRIKTECK. 
 Toute utilisation, modification ou distribution DOIT conserver ces mentions sous peine de poursuites légales.

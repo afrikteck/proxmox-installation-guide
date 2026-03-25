@@ -1,7 +1,7 @@
 # Scripts d'Installation Proxmox - AFRIKTECK
 
 **Propriété intellectuelle :** AFRIKTECK - Datacenter Solutions  
-**Copyright :** © 2024 AFRIKTECK - Tous droits réservés  
+**Copyright :** © 2026 AFRIKTECK - Tous droits réservés  
 
 ---
 
@@ -234,5 +234,5 @@ cat /etc/network/interfaces
 
 ---
 
-**© 2024 AFRIKTECK - Datacenter Solutions, Libreville, Gabon**  
+**© 2026 AFRIKTECK - Datacenter Solutions, Libreville, Gabon**  
 *Propriété intellectuelle AFRIKTECK - Tous droits réservés*

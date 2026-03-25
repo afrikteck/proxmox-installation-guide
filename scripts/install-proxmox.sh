@@ -4,7 +4,7 @@
 # AFRIKTECK Proxmox VE Auto-Installation Script
 # 
 # Propriété intellectuelle: AFRIKTECK - Datacenter Solutions
-# Copyright: © 2024 AFRIKTECK - Tous droits réservés
+# Copyright: © 2026 AFRIKTECK - Tous droits réservés
 # Société: AFRIKTECK, Libreville, Gabon
 # Site web: afrikteck.com
 # Contact: contact@afrikteck.com
@@ -448,7 +448,7 @@ main() {
         
         log "INFO" "Installation Proxmox VE terminée avec succès !"
         echo ""
-        echo -e "${GREEN}© 2024 AFRIKTECK - Datacenter Solutions, $LOCATION${NC}"
+        echo -e "${GREEN}© 2026 AFRIKTECK - Datacenter Solutions, $LOCATION${NC}"
         echo -e "${BLUE}Propriété intellectuelle AFRIKTECK - $WEBSITE${NC}"
         
     else

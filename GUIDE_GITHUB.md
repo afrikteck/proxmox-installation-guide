@@ -1,7 +1,7 @@
 # Guide GitHub - Configuration et Publication - AFRIKTECK
 
 **Propriété intellectuelle :** AFRIKTECK - Datacenter Solutions  
-**Copyright :** © 2024 AFRIKTECK - Tous droits réservés  
+**Copyright :** © 2026 AFRIKTECK - Tous droits réservés  
 **Société :** AFRIKTECK  
 **Localisation :** Libreville, Gabon  
 **Spécialité :** Datacenter et Infrastructure  
@@ -173,14 +173,14 @@ Consultez le fichier `INSTALLATION_PROXMOX_DEBIAN.md` pour le guide détaillé.
 MIT License - Voir le fichier LICENSE pour plus de détails.
 
 ---
-© 2024 AFRIKTECK - Datacenter Solutions, Libreville, Gabon
+© 2026 AFRIKTECK - Datacenter Solutions, Libreville, Gabon
 EOF
 
 # Créer un fichier LICENSE
 cat > LICENSE << 'EOF'
 MIT License
 
-Copyright (c) 2024 AFRIKTECK
+Copyright (c) 2026 AFRIKTECK
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -445,7 +445,7 @@ gh pr list
 
 ## ⚖️ PROPRIÉTÉ INTELLECTUELLE
 
-**© 2024 AFRIKTECK - Datacenter Solutions - Tous droits réservés**
+**© 2026 AFRIKTECK - Datacenter Solutions - Tous droits réservés**
 
 **AVERTISSEMENT LÉGAL :** Ce document est la propriété intellectuelle d'AFRIKTECK. 
 Toute utilisation, modification ou distribution DOIT conserver ces mentions sous peine de poursuites légales.

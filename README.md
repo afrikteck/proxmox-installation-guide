@@ -97,7 +97,7 @@ Voir le fichier `LICENSE` pour les détails complets.
 
 ---
 
-**© 2024 AFRIKTECK - Datacenter Solutions**  
+**© 2026 AFRIKTECK - Datacenter Solutions**  
 *Développé avec ❤️ à Libreville, Gabon*
 
 ---

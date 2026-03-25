@@ -4,7 +4,7 @@
 # AFRIKTECK Proxmox Configuration Script
 # 
 # Propriété intellectuelle: AFRIKTECK - Datacenter Solutions
-# Copyright: © 2024 AFRIKTECK - Tous droits réservés
+# Copyright: © 2026 AFRIKTECK - Tous droits réservés
 # Contact: contact@afrikteck.com
 #===============================================================================
 
@@ -193,7 +193,7 @@ main() {
     echo "2. Accéder à l'interface web: https://$(hostname -I | awk '{print $1}'):8006"
     echo "3. Créer vos premières VMs/Conteneurs"
     echo ""
-    echo "© 2024 AFRIKTECK - Datacenter Solutions"
+    echo "© 2026 AFRIKTECK - Datacenter Solutions"
     echo "Propriété intellectuelle AFRIKTECK - afrikteck.com"
     echo "==============================================================================="
 }
